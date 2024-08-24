@@ -108,7 +108,7 @@
                <div class="w-col w-col-4">
                   <div class="grey-icon-wrapper"><img src="images/confidence.jpg" width="273" sizes="(max-width: 479px) 57vw, (max-width: 767px) 273px, (max-width: 991px) 229.328125px, 273px" alt="" srcset="images/confidence-p-500.jpg 500w, images/confidence.jpg 640w" class="big-icon"/></div>
                   <h3>our mission</h3>
-                  <p>Our goal is simp. We want to help you explore various fashion styles through a single image search. With a simple image upload, we will provide to you information on the specific style without you even needing to describe it.</p>
+                  <p>Our goal is simple. We want to help you explore various fashion styles through a single image search. With a simple image upload, we will provide to you information on the specific style without you even needing to describe it.</p>
                </div>
                <div class="w-col w-col-4">
                   <div class="grey-icon-wrapper push-top"><img src="images/fashion-20confidence.jpg" width="328" sizes="(max-width: 479px) 68vw, (max-width: 767px) 328px, (max-width: 991px) 229.328125px, 299.984375px" alt="" srcset="images/fashion-20confidence-p-500.jpg 500w, images/fashion-20confidence.jpg 800w" class="big-icon"/></div>
@@ -203,41 +203,49 @@
 
          // Modify the fetch request to open the modal with the response data
          document.getElementById('uploadForm').addEventListener('submit', function(event) {
-             event.preventDefault(); // Prevent the form from submitting the traditional way
+    event.preventDefault(); // Prevent the form from submitting the traditional way
 
-             // Get the selected file
-             const fileInput = document.getElementById('imageUpload');
-             const file = fileInput.files[0];
+    // Get the selected file
+    const fileInput = document.getElementById('imageUpload');
+    const file = fileInput.files[0];
 
-             if (file) {
-                 // Create a URL for the uploaded image to display in the modal
-                 const imageUrl = URL.createObjectURL(file);
+    if (file) {
+        // Create a FormData object to send the file
+        const formData = new FormData();
+        formData.append('file', file);
 
-                 // Dummy data for testing without the API
-                 const dummyData = {
-                     predictedStyleImage: "https://via.placeholder.com/300", // Placeholder image for predicted style
-                     predictedStyle: "Casual",
-                     description: "A comfortable and stylish outfit suitable for everyday wear.",
-                     trend: "Currently trending in urban areas.",
-                     relatedStyles: [
-                         "https://via.placeholder.com/100", // Placeholder images for related styles
-                         "https://via.placeholder.com/100",
-                         "https://via.placeholder.com/100",
-                         "https://via.placeholder.com/100",
-                         "https://via.placeholder.com/100"
-                     ]
-                 };
+        // Send the file to the backend API using fetch
+        fetch('/query-image/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Assuming `data.similar_images` contains the related images and `data.similarities` contains the similarity scores
 
-                 // Open the modal and display the image and dummy data
-                 openModal(imageUrl, dummyData);
+            // Dummy variables for the modal
+            const predictedStyle = "Predicted Style from Backend"; // Since your backend doesn't provide this, you might want to set a default or handle it differently
+            const description = "Description from Backend"; // Same as above, set default or handle it differently
+            const trend = "Trend from Backend"; // Same as above
 
-                 // Optional: Revoke the object URL after the modal is displayed to release memory
-                 // URL.revokeObjectURL(imageUrl);
+            // Populate the modal with the data
+            openModal(URL.createObjectURL(file), {
+                predictedStyleImage: data.similar_images[0], // Using the first similar image as the predicted style image
+                predictedStyle: predictedStyle,
+                description: description,
+                trend: trend,
+                relatedStyles: data.similar_images
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error processing your image.');
+        });
 
-             } else {
-                 alert('Please select an image to upload.');
-             }
-         });
+    } else {
+        alert('Please select an image to upload.');
+    }
+});
       </script>
    </body>
 </html>
