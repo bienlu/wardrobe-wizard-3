@@ -202,8 +202,8 @@
          });
 
          // Modify the fetch request to open the modal with the response data
-         document.getElementById('uploadForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the form from submitting the traditional way
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+       event.preventDefault(); // Prevent the form from submitting the traditional way
 
     // Get the selected file
     const fileInput = document.getElementById('imageUpload');
@@ -215,7 +215,7 @@
         formData.append('file', file);
 
         // Send the file to the backend API using fetch
-        fetch('/query-image/', {
+        fetch('http://localhost:8000/query-image/', {  // Ensure the correct API URL with the port number
             method: 'POST',
             body: formData
         })
